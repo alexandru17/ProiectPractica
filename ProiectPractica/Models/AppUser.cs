@@ -5,16 +5,22 @@ namespace ProiectPractica.Models
 {
     public class AppUser : IdentityUser
     {
-        public AppUser(string? numeComplet, ICollection<ResponsabilProiect> proiecteRepartizate)
+        public AppUser()
         {
-            NumeComplet = numeComplet;
+            ProiecteRepartizate = new List<ResponsabilProiect>();
+        }
+
+        public AppUser(string userName) : base(userName)
+        {
+        }
+
+        public AppUser(string? numeComplet, ICollection<ResponsabilProiect> proiecteRepartizate) : this(numeComplet)
+        {
             ProiecteRepartizate = proiecteRepartizate;
         }
 
-        public string? NumeComplet { get; set; }
+        public string? NumeComplet { get; set; } = string.Empty;
 
-        // Proiecte la care userul are acces (este responsabil / manager)
         public ICollection<ResponsabilProiect> ProiecteRepartizate { get; set; }
     }
-
 }

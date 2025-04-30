@@ -1,0 +1,81 @@
+﻿
+@page "/adauga-proiect"
+@using ProiectPractica.Models
+@inject ProiectPractica.Data.ApplicationDbContext DbContext
+@using Microsoft.EntityFrameworkCore
+@using ProiectPractica.Shared
+
+<h3>Adaugă Proiect</h3>
+
+<EditForm Model="@proiectNou" OnValidSubmit="SalveazaProiect">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nume Client</label>
+        <InputText class="form-control" @bind-Value="proiectNou.NumeClient" />
+    </div>
+
+    <div class="mb-3">
+        <label>Domeniu</label>
+        <InputText class="form-control" @bind-Value="proiectNou.Domeniul" />
+    </div>
+
+    <div class="mb-3">
+        <label>Data Semnare</label>
+        <InputDate class="form-control" @bind-Value="proiectNou.DataSemnareContract" />
+    </div>
+
+    <div class="mb-3">
+        <label>Data Încheiere</label>
+        <InputDate class="form-control" @bind-Value="proiectNou.DataIncheiereContract" />
+    </div>
+
+    <div class="mb-3">
+        <label>Valoare Contract</label>
+        <InputNumber class="form-control" @bind-Value="proiectNou.ValoareContract" />
+    </div>
+    <div class="mb-3">
+        <label>Responsabili (selectează unul sau mai mulți)</label>
+        <InputSelectMultiple @bind-Value="utilizatoriSelectati" class="form-select">
+    @foreach (var user in totiUtilizatorii)
+    {
+        <option value="@user.Id">@user.NumeComplet</option>
+    }
+        </InputSelectMultiple>
+    </div>
+    <button class="btn btn-primary" type="submit">Salvează</button>
+</EditForm>
+
+@code {
+    
+    Proiect proiectNou = new();
+    List<string> utilizatoriSelectati = new();
+    List<AppUser> totiUtilizatorii = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        totiUtilizatorii = await DbContext.Users.ToListAsync();
+    }
+
+    async Task SalveazaProiect()
+    {
+        DbContext.Proiecte.Add(proiectNou);
+        await DbContext.SaveChangesAsync();
+
+        foreach (var userId in utilizatoriSelectati)
+        {
+            var responsabil = new ResponsabilProiect
+                {
+                    AppUserId = userId,
+                    ProiectId = proiectNou.ProiectId,
+                    DataAtribuire = DateTime.Now
+                };
+            DbContext.ResponsabiliProiecte.Add(responsabil);
+        }
+
+        await DbContext.SaveChangesAsync();
+        proiectNou = new();
+        utilizatoriSelectati.Clear();
+    }
+}

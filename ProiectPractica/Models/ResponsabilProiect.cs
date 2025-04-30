@@ -2,6 +2,10 @@
 {
     public class ResponsabilProiect
     {
+        public ResponsabilProiect()
+        {
+        }
+
         public ResponsabilProiect(int id, string appUserId, AppUser appUser, int proiectId, Proiect proiect, DateTime dataAtribuire)
         {
             Id = id;

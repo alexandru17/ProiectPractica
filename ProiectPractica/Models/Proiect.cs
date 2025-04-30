@@ -8,6 +8,15 @@ namespace ProiectPractica.Models
 {
     public class Proiect
     {
+        public Proiect()
+        {
+            ActeAditionale = new HashSet<ActAditional>();
+            Taskuri = new HashSet<TaskProiect>();
+            Livrabile = new HashSet<Livrabil>();
+            Subcontractori = new HashSet<Subcontractor>();
+            Responsabili = new HashSet<ResponsabilProiect>();   
+        }
+
         public Proiect(int proiectId, string numeClient, string domeniul, string obiectulContractului, DateTime dataSemnareContract, DateTime dataIncheiereContract, StatusProiect status, bool existaAmendamente, int numarAmendamente, bool esteClientPublic, bool areSubcontractor, int numarubcontaractori, decimal valoareContract, ICollection<ActAditional> acteAditionale, ICollection<TaskProiect> taskuri, ICollection<Livrabil> livrabile, ICollection<Subcontractor> subcontractori, ICollection<ResponsabilProiect> responsabili)
         {
             ProiectId = proiectId;

@@ -40,6 +40,10 @@ namespace ProiectPractica.Models
             Proiect = proiect;
         }
 
+        public TaskProiect()
+        {
+        }
+
         // Legătură cu Proiectul
         public int ProiectId { get; set; }
         public Proiect Proiect { get; set; }

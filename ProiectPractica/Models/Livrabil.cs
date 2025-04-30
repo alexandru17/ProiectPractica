@@ -5,6 +5,10 @@ namespace ProiectPractica.Models
 {
     public class Livrabil
     {
+        public Livrabil()
+        {
+        }
+
         public Livrabil(int id, string nume, string? descriere, DateTime dataEstimata, bool estePredat, int proiectId, Proiect proiect)
         {
             Id = id;
