@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace ProiectPractica.Models
 {
     public class Proiect
@@ -17,31 +18,14 @@ namespace ProiectPractica.Models
             Responsabili = new HashSet<ResponsabilProiect>();   
         }
 
-        public Proiect(int proiectId, string numeClient, string domeniul, string obiectulContractului, DateTime dataSemnareContract, DateTime dataIncheiereContract, StatusProiect status, bool existaAmendamente, int numarAmendamente, bool esteClientPublic, bool areSubcontractor, int numarubcontaractori, decimal valoareContract, ICollection<ActAditional> acteAditionale, ICollection<TaskProiect> taskuri, ICollection<Livrabil> livrabile, ICollection<Subcontractor> subcontractori, ICollection<ResponsabilProiect> responsabili)
-        {
-            ProiectId = proiectId;
-            NumeClient = numeClient;
-            Domeniul = domeniul;
-            ObiectulContractului = obiectulContractului;
-            DataSemnareContract = dataSemnareContract;
-            DataIncheiereContract = dataIncheiereContract;
-            Status = status;
-            ExistaAmendamente = existaAmendamente;
-            NumarAmendamente = numarAmendamente;
-            EsteClientPublic = esteClientPublic;
-            AreSubcontractor = areSubcontractor;
-            Numarubcontaractori = numarubcontaractori;
-            ValoareContract = valoareContract;
-            ActeAditionale = acteAditionale;
-            Taskuri = taskuri;
-            Livrabile = livrabile;
-            Subcontractori = subcontractori;
-            Responsabili = responsabili;
-        }
-
-
+        
+        [Key]
         public int ProiectId { get; set; }
+        
 
+        [Required(ErrorMessage = "Codul proiectului este obligatoriu.")]
+        [StringLength(50, ErrorMessage = "Codul nu poate avea mai mult de 50 de caractere.")]
+        public string ProiectID { get; set; } = string.Empty;
         [Required]
         [StringLength(100)]
         [Display(Name = "Nume client")]
@@ -50,7 +34,7 @@ namespace ProiectPractica.Models
         [Required]
         [StringLength(100)]
         [Display(Name = "Domeniul proiectului")]
-        public string Domeniul { get; set; }
+        public string Domeniul { get; set; } = string.Empty;
 
         [StringLength(500)]
         public string ObiectulContractului { get; set; }
