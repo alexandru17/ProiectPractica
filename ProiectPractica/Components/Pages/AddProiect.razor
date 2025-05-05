@@ -1,14 +1,19 @@
 ﻿@page "/adauga-proiect"
 @using ProiectPractica.Models
+
 @inject ProiectPractica.Data.ApplicationDbContext DbContext
 @using Microsoft.EntityFrameworkCore
-@using ProiectPractica.Shared
 
 <h3>Adaugă Proiect</h3>
 
 @if (!string.IsNullOrEmpty(mesajEroare))
 {
     <div class="alert alert-danger">@mesajEroare</div>
+}
+
+@if (!string.IsNullOrEmpty(mesajSucces))
+{
+    <div class="alert alert-success">@mesajSucces</div>
 }
 
 <EditForm Model="@proiectNou" OnValidSubmit="SalveazaProiect">
@@ -27,8 +32,13 @@
     </div>
 
     <div class="mb-3">
-        <label>Descriere Task</label>
+        <label>Domeniul proiectului</label>
         <InputText class="form-control" @bind-Value="proiectNou.Domeniul" />
+    </div>
+
+    <div class="mb-3">
+        <label>Obiectul contractului</label>
+        <InputText class="form-control" @bind-Value="proiectNou.ObiectulContractului" />
     </div>
 
     <div class="mb-3">
@@ -44,25 +54,92 @@
     <div class="mb-3">
         <label>Valoare Contract</label>
         <InputNumber class="form-control" @bind-Value="proiectNou.ValoareContract" />
+        <ValidationMessage For="@(() => proiectNou.ValoareContract)" />
     </div>
 
-    <div class="form-check mb-3">
-        <InputCheckbox class="form-check-input" @bind-Value="proiectNou.ExistaAmendamente" />
-        <label class="form-check-label">Este amendat?</label>
+    <div class="mb-3">
+        <label>Status</label>
+        <InputSelect class="form-select" @bind-Value="proiectNou.Status">
+            @foreach (var status in Enum.GetValues<StatusProiect>())
+            {
+                <option value="@status">@status</option>
+            }
+        </InputSelect>
     </div>
 
+    <InputCheckbox class="form-check-input" @bind-Value="proiectNou.ExistaAmendamente" />
+    <label class="form-check-label">Este amendat?</label>
     @if (proiectNou.ExistaAmendamente)
     {
         <div class="mb-3">
             <label>Număr amendamente</label>
-            <InputNumber class="form-control" @bind-Value="proiectNou.NumarAmendamente" />
-            <ValidationMessage For="@(() => proiectNou.NumarAmendamente)" />
+            <InputSelect class="form-select" @bind-Value="numarAmendamenteSelectat" @onchange="UpdateAmendamente">
+                <option value="0">-- selectează --</option>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </InputSelect>
+        </div>
+
+        @for (int i = 0; i < amendamente.Count; i++)
+        {
+            <div class="border p-3 mb-2">
+                <label>Tip act adițional @i</label>
+                <InputSelect class="form-select" @bind-Value="amendamente[i].Tip">
+                    @foreach (var tip in tipuriAmendamente)
+                    {
+                        <option value="@tip">@tip</option>
+                    }
+                </InputSelect>
+
+                @if (amendamente[i].Tip == "ModificareValoare")
+                {
+                    <div>
+                        <label>Valoare nouă</label>
+                        <input type="number" class="form-control" @bind="amendamente[i].ModificareValoare!.ValoareNoua" />
+                    </div>
+                }
+                else if (amendamente[i].Tip == "PrelungireContract")
+                {
+                    <div>
+                        <label>Noua dată de încheiere</label>
+                        <input type="date" class="form-control" @bind="amendamente[i].PrelungireContract!.NouaDataIncheiere" />
+                    </div>
+                }
+                else if (amendamente[i].Tip == "ModificareLivrabile")
+                {
+                    <div>
+                        <label>Descriere schimbare</label>
+                        <input class="form-control" @bind="amendamente[i].ModificareLivrabile!.DescriereSchimbare" />
+                    </div>
+                }
+            </div>
+        }
+    }
+
+    <div class="form-check mb-3">
+        <InputCheckbox class="form-check-input" @bind-Value="proiectNou.EsteClientPublic" />
+        <label class="form-check-label">Este client public?</label>
+    </div>
+
+    <div class="form-check mb-3">
+        <InputCheckbox class="form-check-input" @bind-Value="proiectNou.AreSubcontractor" />
+        <label class="form-check-label">Are subcontractor?</label>
+    </div>
+
+    @if (proiectNou.AreSubcontractor)
+    {
+        <div class="mb-3">
+            <label>Număr subcontractori</label>
+            <InputNumber class="form-control" @bind-Value="proiectNou.Numarubcontractori" />
+            <ValidationMessage For="@(() => proiectNou.Numarubcontractori)" />
         </div>
     }
 
     <div class="mb-3">
         <label>Responsabili (selectează unul sau mai mulți)</label>
-        <InputSelectMultiple @bind-Value="utilizatoriSelectati" class="form-select">
+        <InputSelectMultiple @bind="utilizatoriSelectati" class="form-select">
             @foreach (var user in totiUtilizatorii)
             {
                 <option value="@user.Id">@user.NumeComplet</option>
@@ -74,10 +151,46 @@
 </EditForm>
 
 @code {
-    string? mesajEroare = null;
     Proiect proiectNou = new();
     List<string> utilizatoriSelectati = new();
     List<AppUser> totiUtilizatorii = new();
+
+    string? mesajEroare = null;
+    string? mesajSucces = null;
+
+    int numarAmendamenteSelectat = 0;
+    List<AmendamentInput> amendamente = new();
+    void OnCheckboxAmendatChanged(ChangeEventArgs e)
+    {
+        Console.WriteLine($"ExistaAmendamente schimbat: {e.Value}");
+        proiectNou.ExistaAmendamente = (bool)e.Value!;
+        if (!proiectNou.ExistaAmendamente)
+        {
+            Console.WriteLine($"ExistaAmendamente este acum: {proiectNou.ExistaAmendamente}");
+            numarAmendamenteSelectat = 0;
+            amendamente.Clear();
+        }
+        StateHasChanged(); // 🔄 forțează re-randarea UI-ului
+        Console.WriteLine($"ExistaAmendamente este acum: {proiectNou.ExistaAmendamente}");
+    }
+
+
+    List<string> tipuriAmendamente = new()
+    {
+        "ModificareValoare",
+        "PrelungireContract",
+        "ModificareLivrabile"
+    };
+
+    void UpdateAmendamente(ChangeEventArgs e)
+    {
+        Console.WriteLine($"ExistaAmendamente este acum: {proiectNou.ExistaAmendamente}");
+        if (int.TryParse(e.Value?.ToString(), out int n))
+        {
+            numarAmendamenteSelectat = n;
+            amendamente = Enumerable.Range(0, n).Select(_ => new AmendamentInput()).ToList();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,12 +199,24 @@
 
     async Task SalveazaProiect()
     {
-        // Verificăm dacă există deja un proiect cu același cod
+        mesajEroare = null;
+        mesajSucces = null;
+
         bool exista = await DbContext.Proiecte.AnyAsync(p => p.ProiectID == proiectNou.ProiectID);
         if (exista)
         {
-            mesajEroare = "Codul de proiect există deja.";
+            mesajEroare = "Codul proiectului există deja.";
             return;
+        }
+
+        if (!proiectNou.ExistaAmendamente)
+        {
+            proiectNou.NumarAmendamente = 0;
+        }
+
+        if (!proiectNou.AreSubcontractor)
+        {
+            proiectNou.Numarubcontractori = 0;
         }
 
         DbContext.Proiecte.Add(proiectNou);
@@ -100,17 +225,18 @@
         foreach (var userId in utilizatoriSelectati)
         {
             var responsabil = new ResponsabilProiect
-                {
-                    AppUserId = userId,
-                    ProiectId = proiectNou.ProiectId,
-                    DataAtribuire = DateTime.Now
-                };
+            {
+                AppUserId = userId,
+                ProiectId = proiectNou.ProiectId,
+                DataAtribuire = DateTime.Now
+            };
             DbContext.ResponsabiliProiecte.Add(responsabil);
         }
 
         await DbContext.SaveChangesAsync();
+
+        mesajSucces = "Proiectul a fost adăugat cu succes!";
         proiectNou = new();
         utilizatoriSelectati.Clear();
-        mesajEroare = null;
     }
 }

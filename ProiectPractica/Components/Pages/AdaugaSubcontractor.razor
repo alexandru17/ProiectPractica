@@ -1,0 +1,65 @@
+﻿@page "/adauga-subcontractor"
+@using ProiectPractica.Models
+@inject ProiectPractica.Data.ApplicationDbContext DbContext
+
+<h3>Adaugă Subcontractor</h3>
+
+@if (!string.IsNullOrEmpty(mesajEroare))
+{
+    <div class="alert alert-danger">@mesajEroare</div>
+}
+
+@if (!string.IsNullOrEmpty(mesajSucces))
+{
+    <div class="alert alert-success">@mesajSucces</div>
+}
+
+<EditForm Model="@subcontractorNou" OnValidSubmit="SalveazaSubcontractor">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nume</label>
+        <InputText class="form-control" @bind-Value="subcontractorNou.Nume" />
+        <ValidationMessage For="@(() => subcontractorNou.Nume)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Domeniu</label>
+        <InputText class="form-control" @bind-Value="subcontractorNou.Domeniu" />
+        <ValidationMessage For="@(() => subcontractorNou.Domeniu)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="subcontractorNou.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Telefon</label>
+        <InputText class="form-control" @bind-Value="subcontractorNou.Telefon" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Salvează</button>
+</EditForm>
+
+@code {
+    private Subcontractor subcontractorNou = new();
+    private string? mesajEroare = null;
+    private string? mesajSucces = null;
+
+    private async Task SalveazaSubcontractor()
+    {
+        try
+        {
+            DbContext.Subcontractori.Add(subcontractorNou);
+            await DbContext.SaveChangesAsync();
+            mesajSucces = "Subcontractor adăugat cu succes!";
+            subcontractorNou = new Subcontractor(); // Resetăm formularul
+        }
+        catch (Exception ex)
+        {
+            mesajEroare = $"A apărut o eroare: {ex.Message}";
+        }
+    }
+}

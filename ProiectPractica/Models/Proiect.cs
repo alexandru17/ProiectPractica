@@ -74,7 +74,8 @@ namespace ProiectPractica.Models
 
         [Display(Name = "Număr subcontractori")]
         [Range(0, int.MaxValue, ErrorMessage = "Numărul de subcontractori trebuie să fie pozitiv.")]
-        public int Numarubcontaractori { get; set; }
+        public int Numarubcontractori { get; set; }  // Copiat exact cum e folosit
+
 
         [Required]
         [Range(0, double.MaxValue)]
