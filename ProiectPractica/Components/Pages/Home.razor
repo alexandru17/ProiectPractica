@@ -2,6 +2,7 @@
 @using ProiectPractica.Models
 @using Microsoft.EntityFrameworkCore
 @inject ProiectPractica.Data.ApplicationDbContext DbContext
+@namespace ProiectPractica
 
 <h3>LISTA PROIECTELOR MELE</h3>
 
@@ -27,7 +28,7 @@ else
             {
                 <tr>
                     <td>@proiect.NumeClient</td>
-                    <td>@proiect.ProiectID</td>
+                    <td>@proiect.Cod</td>
                     <td>@proiect.Domeniul</td>
                     <td>@proiect.DataSemnareContract.ToString("dd/MM/yyyy")</td>
                     <td>@proiect.DataIncheiereContract.ToString("dd/MM/yyyy")</td>

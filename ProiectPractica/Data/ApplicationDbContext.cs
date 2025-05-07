@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProiectPractica.Models;
 
@@ -33,6 +33,45 @@ namespace ProiectPractica.Data
             modelBuilder.Entity<ModificareValoare>()
                 .Property(m => m.ValoareNoua)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ActAditional>()
+                .HasDiscriminator<string>("TipAct") // va crea o coloană discriminator în tabel
+                .HasValue<ModificareValoare>("ModificareValoare")
+                .HasValue<PrelungireContract>("PrelungireContract")
+                .HasValue<ModificareLivrabile>("ModificareLivrabile");
+
+            modelBuilder.Entity<Proiect>()
+                .HasMany(p => p.Responsabili)
+                .WithOne(r => r.Proiect)
+                .HasForeignKey(r => r.Cod)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Proiect>()
+                .HasMany(p => p.Subcontractori)
+                .WithOne(s => s.Proiect)
+                .HasForeignKey(s => s.Cod)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Proiect>()
+                .HasMany(p => p.Livrabile)
+                .WithOne(l => l.Proiect)
+                .HasForeignKey(l => l.Cod)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Proiect>()
+                .HasMany(p => p.Taskuri)
+                .WithOne(t => t.Proiect)
+                .HasForeignKey(t => t.Cod)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<Proiect>()
+                .HasMany(p => p.ActeAditionale)
+                .WithOne(a => a.Proiect)
+                .HasForeignKey(a => a.Cod)
+                .OnDelete(DeleteBehavior.Cascade);
         }
+        public DbSet<Livrabil> Livrabile { get; set; }
+
     }
 }

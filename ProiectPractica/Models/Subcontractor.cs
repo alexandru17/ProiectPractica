@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ProiectPractica.Models;
 
 namespace ProiectPractica.Models
@@ -9,23 +10,17 @@ namespace ProiectPractica.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        public string Nume { get; set; }
+        [Required, StringLength(100)]
+        public string Nume { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(100)]
-        public string Domeniu { get; set; }
+        [Required, StringLength(100)]
+        public string Domeniu { get; set; } = string.Empty;
 
-
-        public int ProiectId { get; set; }
-        public Proiect Proiect { get; set; }
-
-        // Poți adăuga și alte câmpuri dacă vrei
-        [StringLength(100)]
-        public string Email { get; set; }
-        [StringLength(50)]
-        public string Telefon { get; set; }
+        public string? Email { get; set; } // <- nu este obligatoriu
+        public string? Telefon { get; set; } // <- nu este obligatoriu
+        [ForeignKey(nameof(Proiect))]
+        public int Cod { get; set; }
+        public Proiect Proiect { get; set; } = null!;
     }
 }
 

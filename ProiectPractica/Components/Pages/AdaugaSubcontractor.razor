@@ -2,7 +2,7 @@
 @using ProiectPractica.Models
 @inject ProiectPractica.Data.ApplicationDbContext DbContext
 
-<h3>Adaugă Subcontractor</h3>
+<h2>Adaugă Subcontractor</h2>
 
 @if (!string.IsNullOrEmpty(mesajEroare))
 {
@@ -14,48 +14,72 @@
     <div class="alert alert-success">@mesajSucces</div>
 }
 
-<EditForm Model="@subcontractorNou" OnValidSubmit="SalveazaSubcontractor">
+<EditForm Model="@subcontractorNou" OnValidSubmit="SalveazaSubcontractor" FormName="AdaugaSubcontractorForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
-        <label>Nume</label>
-        <InputText class="form-control" @bind-Value="subcontractorNou.Nume" />
+        <label for="nume">Nume <span class="text-danger">*</span></label>
+        <InputText id="nume" class="form-control" @bind-Value="subcontractorNou.Nume" />
         <ValidationMessage For="@(() => subcontractorNou.Nume)" />
     </div>
 
     <div class="mb-3">
-        <label>Domeniu</label>
-        <InputText class="form-control" @bind-Value="subcontractorNou.Domeniu" />
+        <label for="domeniu">Domeniu <span class="text-danger">*</span></label>
+        <InputText id="domeniu" class="form-control" @bind-Value="subcontractorNou.Domeniu" />
         <ValidationMessage For="@(() => subcontractorNou.Domeniu)" />
     </div>
 
     <div class="mb-3">
-        <label>Email</label>
-        <InputText class="form-control" @bind-Value="subcontractorNou.Email" />
+        <label for="email">Email (opțional)</label>
+        <InputText id="email" class="form-control" @bind-Value="subcontractorNou.Email" />
     </div>
 
     <div class="mb-3">
-        <label>Telefon</label>
-        <InputText class="form-control" @bind-Value="subcontractorNou.Telefon" />
+        <label for="telefon">Telefon (opțional)</label>
+        <InputText id="telefon" class="form-control" @bind-Value="subcontractorNou.Telefon" />
     </div>
 
     <button class="btn btn-primary" type="submit">Salvează</button>
 </EditForm>
 
 @code {
-    private Subcontractor subcontractorNou = new();
+    private Subcontractor subcontractorNou = new Subcontractor
+        {
+            Nume = string.Empty,
+            Domeniu = string.Empty,
+            Email = string.Empty,
+            Telefon = string.Empty
+        };
+
     private string? mesajEroare = null;
     private string? mesajSucces = null;
 
     private async Task SalveazaSubcontractor()
     {
+        mesajEroare = null;
+        mesajSucces = null;
+
         try
         {
+            if (string.IsNullOrWhiteSpace(subcontractorNou.Nume) || string.IsNullOrWhiteSpace(subcontractorNou.Domeniu))
+            {
+                mesajEroare = "Nume și Domeniu sunt obligatorii.";
+                return;
+            }
+
             DbContext.Subcontractori.Add(subcontractorNou);
             await DbContext.SaveChangesAsync();
             mesajSucces = "Subcontractor adăugat cu succes!";
-            subcontractorNou = new Subcontractor(); // Resetăm formularul
+
+            // Resetare formular
+            subcontractorNou = new Subcontractor
+                {
+                    Nume = string.Empty,
+                    Domeniu = string.Empty,
+                    Email = string.Empty,
+                    Telefon = string.Empty
+                };
         }
         catch (Exception ex)
         {

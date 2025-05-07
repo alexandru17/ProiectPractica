@@ -1,6 +1,5 @@
 ﻿@page "/adauga-proiect"
 @using ProiectPractica.Models
-
 @inject ProiectPractica.Data.ApplicationDbContext DbContext
 @using Microsoft.EntityFrameworkCore
 
@@ -16,7 +15,7 @@
     <div class="alert alert-success">@mesajSucces</div>
 }
 
-<EditForm Model="@proiectNou" OnValidSubmit="SalveazaProiect">
+<EditForm Model="@proiectNou" OnValidSubmit="SalveazaProiect" FormName="AddProiectForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -25,11 +24,7 @@
         <InputText class="form-control" @bind-Value="proiectNou.NumeClient" />
     </div>
 
-    <div class="mb-3">
-        <label>Cod Proiect</label>
-        <InputText class="form-control" @bind-Value="proiectNou.ProiectID" />
-        <ValidationMessage For="@(() => proiectNou.ProiectID)" />
-    </div>
+  
 
     <div class="mb-3">
         <label>Domeniul proiectului</label>
@@ -58,6 +53,11 @@
     </div>
 
     <div class="mb-3">
+        <label>Numar livrabile</label>
+        <InputNumber class="form-control" @bind-Value="proiectNou.NrLivrabile" />
+        <ValidationMessage For="@(() => proiectNou.NrLivrabile)" />
+    </div>
+    <div class="mb-3">
         <label>Status</label>
         <InputSelect class="form-select" @bind-Value="proiectNou.Status">
             @foreach (var status in Enum.GetValues<StatusProiect>())
@@ -67,57 +67,7 @@
         </InputSelect>
     </div>
 
-    <InputCheckbox class="form-check-input" @bind-Value="proiectNou.ExistaAmendamente" />
-    <label class="form-check-label">Este amendat?</label>
-    @if (proiectNou.ExistaAmendamente)
-    {
-        <div class="mb-3">
-            <label>Număr amendamente</label>
-            <InputSelect class="form-select" @bind-Value="numarAmendamenteSelectat" @onchange="UpdateAmendamente">
-                <option value="0">-- selectează --</option>
-                @for (int i = 1; i <= 5; i++)
-                {
-                    <option value="@i">@i</option>
-                }
-            </InputSelect>
-        </div>
-
-        @for (int i = 0; i < amendamente.Count; i++)
-        {
-            <div class="border p-3 mb-2">
-                <label>Tip act adițional @i</label>
-                <InputSelect class="form-select" @bind-Value="amendamente[i].Tip">
-                    @foreach (var tip in tipuriAmendamente)
-                    {
-                        <option value="@tip">@tip</option>
-                    }
-                </InputSelect>
-
-                @if (amendamente[i].Tip == "ModificareValoare")
-                {
-                    <div>
-                        <label>Valoare nouă</label>
-                        <input type="number" class="form-control" @bind="amendamente[i].ModificareValoare!.ValoareNoua" />
-                    </div>
-                }
-                else if (amendamente[i].Tip == "PrelungireContract")
-                {
-                    <div>
-                        <label>Noua dată de încheiere</label>
-                        <input type="date" class="form-control" @bind="amendamente[i].PrelungireContract!.NouaDataIncheiere" />
-                    </div>
-                }
-                else if (amendamente[i].Tip == "ModificareLivrabile")
-                {
-                    <div>
-                        <label>Descriere schimbare</label>
-                        <input class="form-control" @bind="amendamente[i].ModificareLivrabile!.DescriereSchimbare" />
-                    </div>
-                }
-            </div>
-        }
-    }
-
+    
     <div class="form-check mb-3">
         <InputCheckbox class="form-check-input" @bind-Value="proiectNou.EsteClientPublic" />
         <label class="form-check-label">Este client public?</label>
@@ -157,23 +107,9 @@
 
     string? mesajEroare = null;
     string? mesajSucces = null;
-
     int numarAmendamenteSelectat = 0;
-    List<AmendamentInput> amendamente = new();
-    void OnCheckboxAmendatChanged(ChangeEventArgs e)
-    {
-        Console.WriteLine($"ExistaAmendamente schimbat: {e.Value}");
-        proiectNou.ExistaAmendamente = (bool)e.Value!;
-        if (!proiectNou.ExistaAmendamente)
-        {
-            Console.WriteLine($"ExistaAmendamente este acum: {proiectNou.ExistaAmendamente}");
-            numarAmendamenteSelectat = 0;
-            amendamente.Clear();
-        }
-        StateHasChanged(); // 🔄 forțează re-randarea UI-ului
-        Console.WriteLine($"ExistaAmendamente este acum: {proiectNou.ExistaAmendamente}");
-    }
 
+    List<AmendamentInput> amendamente = new();
 
     List<string> tipuriAmendamente = new()
     {
@@ -182,27 +118,20 @@
         "ModificareLivrabile"
     };
 
-    void UpdateAmendamente(ChangeEventArgs e)
-    {
-        Console.WriteLine($"ExistaAmendamente este acum: {proiectNou.ExistaAmendamente}");
-        if (int.TryParse(e.Value?.ToString(), out int n))
-        {
-            numarAmendamenteSelectat = n;
-            amendamente = Enumerable.Range(0, n).Select(_ => new AmendamentInput()).ToList();
-        }
-    }
-
+   
+   
     protected override async Task OnInitializedAsync()
     {
         totiUtilizatorii = await DbContext.Users.ToListAsync();
     }
 
+   
     async Task SalveazaProiect()
     {
         mesajEroare = null;
         mesajSucces = null;
 
-        bool exista = await DbContext.Proiecte.AnyAsync(p => p.ProiectID == proiectNou.ProiectID);
+        bool exista = await DbContext.Proiecte.AnyAsync(p => p.Cod == proiectNou.Cod);
         if (exista)
         {
             mesajEroare = "Codul proiectului există deja.";
@@ -222,21 +151,25 @@
         DbContext.Proiecte.Add(proiectNou);
         await DbContext.SaveChangesAsync();
 
+        // Salvare responsabili
         foreach (var userId in utilizatoriSelectati)
         {
             var responsabil = new ResponsabilProiect
             {
                 AppUserId = userId,
-                ProiectId = proiectNou.ProiectId,
+                Cod = proiectNou.Cod,
                 DataAtribuire = DateTime.Now
             };
             DbContext.ResponsabiliProiecte.Add(responsabil);
         }
 
+       
         await DbContext.SaveChangesAsync();
 
         mesajSucces = "Proiectul a fost adăugat cu succes!";
         proiectNou = new();
         utilizatoriSelectati.Clear();
+        amendamente.Clear();
+        numarAmendamenteSelectat = 0;
     }
 }

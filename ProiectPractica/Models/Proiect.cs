@@ -20,12 +20,10 @@ namespace ProiectPractica.Models
 
         
         [Key]
-        public int ProiectId { get; set; }
+        public int Cod { get; set; }
         
 
-        [Required(ErrorMessage = "Codul proiectului este obligatoriu.")]
-        [StringLength(50, ErrorMessage = "Codul nu poate avea mai mult de 50 de caractere.")]
-        public string ProiectID { get; set; } = string.Empty;
+        
         [Required]
         [StringLength(100)]
         [Display(Name = "Nume client")]
@@ -76,12 +74,14 @@ namespace ProiectPractica.Models
         [Range(0, int.MaxValue, ErrorMessage = "Numărul de subcontractori trebuie să fie pozitiv.")]
         public int Numarubcontractori { get; set; }  // Copiat exact cum e folosit
 
+        [Range(0, int.MaxValue, ErrorMessage = "Numărul de livrabile trebuie să fie pozitiv.")]
+        public int NrLivrabile { get; set; }
 
         [Required]
         [Range(0, double.MaxValue)]
         [DataType(DataType.Currency)]
         public decimal ValoareContract { get; set; }
-
+        
         // Relații
         public ICollection<ActAditional> ActeAditionale { get; set; }
         public ICollection<TaskProiect> Taskuri { get; set; }

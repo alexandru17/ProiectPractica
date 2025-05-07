@@ -12,8 +12,8 @@ using ProiectPractica.Data;
 namespace ProiectPractica.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250430104734_Icreate")]
-    partial class Icreate
+    [Migration("20250507111504_AdaugareNrLivrabile")]
+    partial class AdaugareNrLivrabile
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -166,24 +166,24 @@ namespace ProiectPractica.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Cod")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DataAct")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Discriminator")
+                    b.Property<string>("TipAct")
                         .IsRequired()
                         .HasMaxLength(21)
                         .HasColumnType("nvarchar(21)");
 
-                    b.Property<int>("ProiectId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ProiectId");
+                    b.HasIndex("Cod");
 
                     b.ToTable("ActeAditionale");
 
-                    b.HasDiscriminator().HasValue("ActAditional");
+                    b.HasDiscriminator<string>("TipAct").HasValue("ActAditional");
 
                     b.UseTphMappingStrategy();
                 });
@@ -264,6 +264,9 @@ namespace ProiectPractica.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Cod")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DataEstimata")
                         .HasColumnType("datetime2");
 
@@ -277,23 +280,20 @@ namespace ProiectPractica.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProiectId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ProiectId");
+                    b.HasIndex("Cod");
 
-                    b.ToTable("Livrabil");
+                    b.ToTable("Livrabile");
                 });
 
             modelBuilder.Entity("ProiectPractica.Models.Proiect", b =>
                 {
-                    b.Property<int>("ProiectId")
+                    b.Property<int>("Cod")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProiectId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Cod"));
 
                     b.Property<bool>("AreSubcontractor")
                         .HasColumnType("bit");
@@ -315,10 +315,13 @@ namespace ProiectPractica.Migrations
                     b.Property<bool>("ExistaAmendamente")
                         .HasColumnType("bit");
 
+                    b.Property<int>("NrLivrabile")
+                        .HasColumnType("int");
+
                     b.Property<int>("NumarAmendamente")
                         .HasColumnType("int");
 
-                    b.Property<int>("Numarubcontaractori")
+                    b.Property<int>("Numarubcontractori")
                         .HasColumnType("int");
 
                     b.Property<string>("NumeClient")
@@ -331,11 +334,6 @@ namespace ProiectPractica.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("ProiectID")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<int>("Status")
                         .HasMaxLength(50)
                         .HasColumnType("int");
@@ -344,7 +342,7 @@ namespace ProiectPractica.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("ProiectId");
+                    b.HasKey("Cod");
 
                     b.ToTable("Proiecte");
                 });
@@ -361,17 +359,17 @@ namespace ProiectPractica.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("Cod")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DataAtribuire")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ProiectId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
-                    b.HasIndex("ProiectId");
+                    b.HasIndex("Cod");
 
                     b.ToTable("ResponsabiliProiecte");
                 });
@@ -383,6 +381,9 @@ namespace ProiectPractica.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cod")
+                        .HasColumnType("int");
 
                     b.Property<string>("Domeniu")
                         .IsRequired()
@@ -399,9 +400,6 @@ namespace ProiectPractica.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("ProiectId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Telefon")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -409,7 +407,7 @@ namespace ProiectPractica.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProiectId");
+                    b.HasIndex("Cod");
 
                     b.ToTable("Subcontractori");
                 });
@@ -421,6 +419,9 @@ namespace ProiectPractica.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cod")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DataStart")
                         .HasColumnType("datetime2");
@@ -436,9 +437,6 @@ namespace ProiectPractica.Migrations
                     b.Property<bool>("EsteNotificare")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProiectId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Responsabil")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -450,7 +448,7 @@ namespace ProiectPractica.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProiectId");
+                    b.HasIndex("Cod");
 
                     b.ToTable("Taskuri");
                 });
@@ -551,7 +549,7 @@ namespace ProiectPractica.Migrations
                 {
                     b.HasOne("ProiectPractica.Models.Proiect", "Proiect")
                         .WithMany("ActeAditionale")
-                        .HasForeignKey("ProiectId")
+                        .HasForeignKey("Cod")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -562,8 +560,8 @@ namespace ProiectPractica.Migrations
                 {
                     b.HasOne("ProiectPractica.Models.Proiect", "Proiect")
                         .WithMany("Livrabile")
-                        .HasForeignKey("ProiectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("Cod")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Proiect");
@@ -579,7 +577,7 @@ namespace ProiectPractica.Migrations
 
                     b.HasOne("ProiectPractica.Models.Proiect", "Proiect")
                         .WithMany("Responsabili")
-                        .HasForeignKey("ProiectId")
+                        .HasForeignKey("Cod")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -592,7 +590,7 @@ namespace ProiectPractica.Migrations
                 {
                     b.HasOne("ProiectPractica.Models.Proiect", "Proiect")
                         .WithMany("Subcontractori")
-                        .HasForeignKey("ProiectId")
+                        .HasForeignKey("Cod")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -603,7 +601,7 @@ namespace ProiectPractica.Migrations
                 {
                     b.HasOne("ProiectPractica.Models.Proiect", "Proiect")
                         .WithMany("Taskuri")
-                        .HasForeignKey("ProiectId")
+                        .HasForeignKey("Cod")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
