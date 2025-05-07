@@ -4,35 +4,26 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace ProiectPractica.Models
 {
     public class Proiect
     {
-        public Proiect(int proiectId, string numeClient, string domeniul, string obiectulContractului, DateTime dataSemnareContract, DateTime dataIncheiereContract, StatusProiect status, bool existaAmendamente, int numarAmendamente, bool esteClientPublic, bool areSubcontractor, int numarubcontaractori, decimal valoareContract, ICollection<ActAditional> acteAditionale, ICollection<TaskProiect> taskuri, ICollection<Livrabil> livrabile, ICollection<Subcontractor> subcontractori, ICollection<ResponsabilProiect> responsabili)
+        public Proiect()
         {
-            ProiectId = proiectId;
-            NumeClient = numeClient;
-            Domeniul = domeniul;
-            ObiectulContractului = obiectulContractului;
-            DataSemnareContract = dataSemnareContract;
-            DataIncheiereContract = dataIncheiereContract;
-            Status = status;
-            ExistaAmendamente = existaAmendamente;
-            NumarAmendamente = numarAmendamente;
-            EsteClientPublic = esteClientPublic;
-            AreSubcontractor = areSubcontractor;
-            Numarubcontaractori = numarubcontaractori;
-            ValoareContract = valoareContract;
-            ActeAditionale = acteAditionale;
-            Taskuri = taskuri;
-            Livrabile = livrabile;
-            Subcontractori = subcontractori;
-            Responsabili = responsabili;
+            ActeAditionale = new HashSet<ActAditional>();
+            Taskuri = new HashSet<TaskProiect>();
+            Livrabile = new HashSet<Livrabil>();
+            Subcontractori = new HashSet<Subcontractor>();
+            Responsabili = new HashSet<ResponsabilProiect>();   
         }
 
+        
+        [Key]
+        public int Cod { get; set; }
+        
 
-        public int ProiectId { get; set; }
-
+        
         [Required]
         [StringLength(100)]
         [Display(Name = "Nume client")]
@@ -41,7 +32,7 @@ namespace ProiectPractica.Models
         [Required]
         [StringLength(100)]
         [Display(Name = "Domeniul proiectului")]
-        public string Domeniul { get; set; }
+        public string Domeniul { get; set; } = string.Empty;
 
         [StringLength(500)]
         public string ObiectulContractului { get; set; }
@@ -81,13 +72,16 @@ namespace ProiectPractica.Models
 
         [Display(Name = "Număr subcontractori")]
         [Range(0, int.MaxValue, ErrorMessage = "Numărul de subcontractori trebuie să fie pozitiv.")]
-        public int Numarubcontaractori { get; set; }
+        public int Numarubcontractori { get; set; }  // Copiat exact cum e folosit
+
+        [Range(0, int.MaxValue, ErrorMessage = "Numărul de livrabile trebuie să fie pozitiv.")]
+        public int NrLivrabile { get; set; }
 
         [Required]
         [Range(0, double.MaxValue)]
         [DataType(DataType.Currency)]
         public decimal ValoareContract { get; set; }
-
+        
         // Relații
         public ICollection<ActAditional> ActeAditionale { get; set; }
         public ICollection<TaskProiect> Taskuri { get; set; }
