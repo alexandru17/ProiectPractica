@@ -48,7 +48,6 @@ namespace ProiectPractica.Models
         public DateTime DataIncheiereContract { get; set; }
 
         [Required]
-        [StringLength(50)]
         public StatusProiect Status { get; set; }
 
         [Required]
